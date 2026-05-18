@@ -2,7 +2,9 @@ import numpy as np
 import pandas as pd
 from pathlib import Path
 
-out_dir = Path("../../data/factors")
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+out_dir = PROJECT_ROOT / "data" / "factors"
 out_dir.mkdir(parents=True,exist_ok=True)
 out_path= out_dir/"basic_factors.parquet"
 
@@ -90,7 +92,7 @@ def get_basic_factor_names() -> list[str]:
 
 
 if __name__ == "__main__":
-    panel = pd.read_parquet("../../data/processed/us_equity_daily_clean.parquet")
+    panel = pd.read_parquet(PROJECT_ROOT / "data" / "processed" / "us_equity_daily_clean.parquet")
 
     panel = add_basic_factors(panel)
 

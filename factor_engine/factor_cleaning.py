@@ -7,7 +7,7 @@ def clean_factor(
         panel:pd.DataFrame,
         factor_name:str,
         lower:float=0.01,
-        upper:float=0.99
+        upper:float=0.99,
 )->pd.Series:
      """
      Clean one factor by
@@ -34,9 +34,9 @@ def clean_factor(
 
 def clean_factors(
         panel:pd.DataFrame,
-        factors_name:list[str],
+        factor_names:list[str],
         lower:float=0.01,
-        upper:float=0.99
+        upper:float=0.99,
 )->pd.DataFrame:
 
     """
@@ -47,7 +47,7 @@ def clean_factors(
     panel = panel.copy()
     panel = panel.sort_values(["date","stock"]).reset_index(drop=True)
 
-    for factor_name in factors_name:
+    for factor_name in factor_names:
         clean_name = factor_name+"_clean"
 
         panel[clean_name] = clean_factor(panel,factor_name,lower=lower,upper=upper)

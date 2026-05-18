@@ -2,7 +2,11 @@ from pathlib import Path
 import pandas as pd
 from factor_engine.operators import(delay,delta,pct_change,ts_mean,ts_rank,ts_corr,cs_rank,cs_zscore,ts_std)
 
-data_path = Path("../data/processed/us_equity_daily_clean.parquet")
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+data_path = PROJECT_ROOT / "data" / "processed" / "us_equity_daily_clean.parquet"
 panel = pd.read_parquet(data_path)
 
 panel=panel.sort_values(["stock","date"]).reset_index(drop=True)
