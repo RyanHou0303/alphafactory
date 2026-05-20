@@ -1,5 +1,10 @@
+"""
+This file provides some basic operators help to calculate the factors
+"""
+
 import numpy as np
 import pandas as pd
+from pandas import DataFrame
 
 
 def delay(panel: pd.DataFrame, column: str, n: int) -> pd.Series:
@@ -118,7 +123,7 @@ def ts_corr(
     column_y: str,
     window: int,
     min_periods: int | None = None,
-) -> pd.Series:
+) -> DataFrame:
     """
     rolling correlation between two columns
     """
@@ -143,7 +148,7 @@ def ts_cov(
     column_y: str,
     window: int,
     min_periods: int | None = None,
-) -> pd.Series:
+) -> DataFrame:
     if min_periods is None:
         min_periods = window
 
@@ -163,13 +168,17 @@ def cs_zscore(
     panel: pd.DataFrame,
     column: str,
 ) -> pd.Series:
+
+    """providing the cross-section z-score in certain day"""
     grouped = panel.groupby("date")[column]
     mean = grouped.transform("mean")
     std = grouped.transform("std")
     return (panel[column] - mean) / std.replace(0, np.nan)
 
 
-def cs_rank(panel: pd.DataFrame, column: str) -> pd.Series:
+def cs_rank(panel: pd.DataFrame, column: str) -> DataFrame:
+
+    """out the rank of each item in cross-section"""
     return panel.groupby("date")[column].rank(pct=True)
 
 
@@ -179,6 +188,8 @@ def winsorize(
     lower: float,
     upper: float,
 ) -> pd.Series:
+
+    """winsorized the upper and lower outlier"""
     def clip_one_day(x: pd.Series) -> pd.Series:
         lo = x.quantile(lower)
         hi = x.quantile(upper)
