@@ -52,7 +52,7 @@ def variance_ratio(ticker:str,q:int):
     vr = np.var(rq,ddof=1)/(q*np.var(r1,ddof=1))
 
     return vr
-q_list = np.arange(1,30,2)
+q_list = np.arange(1,100,2)
 vr_list=[]
 
 for q in q_list:
@@ -72,7 +72,8 @@ plt.show()
 
 
 
-tau_list = [1, 2, 3, 4, 6, 8, 12, 16, 24, 32]
+tau_list = [i for i in range(1,100)]
+"""
 for i in tau_list:
         push_response_result = push_response("AAPL",tau=i)
         plt.figure(figsize=(7,5))
@@ -84,6 +85,7 @@ for i in tau_list:
         plt.title(f"tau = {i}")
         plt.tight_layout()
         plt.show()
+"""
 
 
 
