@@ -79,7 +79,7 @@ factor_data["combined_alpha"] = build_combined_alpha(
     weighting="rank_icir",   # or "equal"
 
 )
-print(factor_data["combined_alpha"])
+print(factor_data)
 
 
 

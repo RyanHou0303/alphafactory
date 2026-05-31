@@ -7,6 +7,9 @@ from scipy.stats import spearmanr
 PROJECTROOT = Path(__file__).resolve().parents[1]
 in_path = PROJECTROOT / "data" / "factors" / "clean_factors.parquet"
 panel = pd.read_parquet(in_path)
+
+
+
 def calc_daily_ic(
         panel: pd.DataFrame,
         factor_name: str,
@@ -31,6 +34,7 @@ def calc_daily_ic(
     ic.name =f"{factor_name}_{return_name}_{method}_ic"
 
     return ic
+
 
 def summarize_ic(
         ic: pd.DataFrame,
@@ -83,6 +87,64 @@ def evaluate_ic(panel: pd.DataFrame,factor_names: list[str],return_name: str = "
     pd.set_option('display.max_columns', None)
     return result
 
+def calc_ic_summary_in_window(
+        window_data:pd.DataFrame,
+        factor_names: list[str],
+        return_col:str="future_return_5d",
+)->pd.DataFrame:
+    """
+    calculate Ic summary inside one historical rolling window
+    """
+    rows=[]
+
+    for factor in factor_names:
+        daily_ic=[]
+        for _, one_day in window_data.groupby("date"):
+            temp=one_day[[factor,return_col]].dropna()
+
+            if len(temp)<5:
+                continue
+
+            ic = temp[factor].corr(temp[return_col],method="spearman")
+            daily_ic.append(ic)
+        daily_ic = pd.Series(daily_ic).dropna()
+
+        if len(daily_ic)==0:
+            continue
+
+        mean_ic = daily_ic.mean()
+        std_ic = daily_ic.std()
+
+        if std_ic ==0 or pd.isna(std_ic):
+            continue
+
+        icir = mean_ic/std_ic
+
+        rows.append(
+            {
+                "factor":factor,
+                "mean_rank_ic":mean_ic,
+                "std_rank_ic":std_ic,
+                "rank_icir":icir,
+                "abs_rank_icir":abs(icir),
+                "directon":1.0 if mean_ic >=0 else -1.0,
+                "n_days": len(daily_ic)
+
+            }
+        )
+    result = pd.DataFrame(rows)
+
+    if len(result)==0:
+        return result
+
+    result = result.sort_values("abs_rank_icir",ascending=False).reset_index(drop=True)
+
+    return result
+
+print(calc_ic_summary_in_window(panel,[ 'mom_5d_clean', 'mom_20d_clean',
+       'mom_60d_clean', 'rev_5d_clean', 'rev_20d_clean', 'vol_20d_clean',
+       'vol_60d_clean', 'volume_mom_20d_clean', 'dollar_volume_20d_clean',
+       'amihud_illiq_20d_clean', 'price_volume_corr_20d_clean']))
 
 print(evaluate_ic(panel,[ 'mom_5d_clean', 'mom_20d_clean',
        'mom_60d_clean', 'rev_5d_clean', 'rev_20d_clean', 'vol_20d_clean',
